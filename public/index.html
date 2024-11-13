@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Online Notepad and Character Count</title>
+</head>
+<body>
+    <h1>Online Notepad (Press Ctrl+S to Save)</h1>
+    <textarea id="note" rows="10" cols="50" placeholder="Start typing..."></textarea>
+    <p id="counter">Characters: 0 | Words: 0</p>
+    <button onclick="saveNote()">Save Note</button>
+    <button onclick="saveFile()">Save as .txt</button>
+
+    <script>
+        const textarea = document.getElementById('note');
+        const counter = document.getElementById('counter');
+
+        // Update character and word count
+        textarea.addEventListener('input', function () {
+            const text = textarea.value;
+            const charCount = text.length;
+            const wordCount = text.trim().split(/\s+/).length;
+            counter.innerText = `Characters: ${charCount} | Words: ${wordCount}`;
+        });
+
+        function saveNote() {
+            const content = textarea.value;
+            fetch('/save-note', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ content })
+            }).then(response => response.text())
+              .then(data => {
+                  alert(data);
+              });
+        }
+
+        function saveFile() {
+            const content = textarea.value;
+            fetch('/save-file', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ content })
+            }).then(response => response.text())
+              .then(data => {
+                  alert(data);
+              });
+        }
+    </script>
+</body>
+</html>
