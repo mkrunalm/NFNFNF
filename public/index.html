@@ -1,14 +1,59 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Notepad and Character Count</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        #container {
+            width: 50%;
+            height: 80%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        textarea {
+            flex-grow: 1;
+            width: 100%;
+            resize: none;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        #counter {
+            margin-top: 10px;
+            text-align: right;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
-    <h1>Online Notepad (Press Ctrl+S to Save)</h1>
-    <textarea id="note" rows="10" cols="50" placeholder="Start typing..."></textarea>
-    <p id="counter">Characters: 0 | Words: 0</p>
-    <button onclick="saveNote()">Save Note</button>
-    <button onclick="saveFile()">Save as .txt</button>
+    <div id="container">
+        <textarea id="note" placeholder="Start typing..."></textarea>
+        <p id="counter">Characters: 0 | Words: 0</p>
+        <button onclick="saveFile()">Save as .txt</button>
+    </div>
 
     <script>
         const textarea = document.getElementById('note');
@@ -18,36 +63,27 @@
         textarea.addEventListener('input', function () {
             const text = textarea.value;
             const charCount = text.length;
-            const wordCount = text.trim().split(/\s+/).length;
+            const wordCount = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
             counter.innerText = `Characters: ${charCount} | Words: ${wordCount}`;
         });
 
-        function saveNote() {
-            const content = textarea.value;
-            fetch('/save-note', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ content })
-            }).then(response => response.text())
-              .then(data => {
-                  alert(data);
-              });
-        }
-
         function saveFile() {
             const content = textarea.value;
-            fetch('/save-file', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ content })
-            }).then(response => response.text())
-              .then(data => {
-                  alert(data);
-              });
+
+            // Create a Blob object representing the data as a plain text file
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+
+            // Create an anchor element and simulate a click to download the file
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `notepad_${Date.now()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+
+            // Remove the anchor element after download
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
         }
     </script>
 </body>
