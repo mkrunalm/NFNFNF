@@ -59,13 +59,29 @@
         const textarea = document.getElementById('note');
         const counter = document.getElementById('counter');
 
-        // Update character and word count
+        // Load saved note from localStorage if available
+        window.onload = function () {
+            const savedNote = localStorage.getItem('noteContent');
+            if (savedNote) {
+                textarea.value = savedNote;
+                updateCounter();
+            }
+        };
+
+        // Save text to localStorage on every input
         textarea.addEventListener('input', function () {
+            const text = textarea.value;
+            localStorage.setItem('noteContent', text);
+            updateCounter();
+        });
+
+        // Update character and word count
+        function updateCounter() {
             const text = textarea.value;
             const charCount = text.length;
             const wordCount = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
             counter.innerText = `Characters: ${charCount} | Words: ${wordCount}`;
-        });
+        }
 
         function saveFile() {
             const content = textarea.value;
